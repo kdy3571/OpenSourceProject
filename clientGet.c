@@ -11,7 +11,7 @@
  *
  * When we test your server, we will be using modifications to this client.
  *
- */
+ */ 테스트
 
 
 #include <stdio.h>
