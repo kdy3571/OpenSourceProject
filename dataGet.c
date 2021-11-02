@@ -109,7 +109,7 @@ void getINFO(MYSQL *conn, int argc, char *argv[],char *content)
     }
   }
   if(index == 0){
-    sprintf(content, "** Cannot find sensor name;%s\n", name);
+    sprintf(content, "** Cannot find sensor name: %s\n", name);
   }
   else {
     sprintf(content,"%d %.1f %.1f \n", cnt, ave, max);
