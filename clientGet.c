@@ -168,7 +168,7 @@
                      printf("Please enter <sname>\n");
              }
 
-             else if (!strcmp(command, "QUIT") || !strcmp(command, "EXIT")) {W
+             else if (!strcmp(command, "QUIT") || !strcmp(command, "EXIT")) {
                  if (!*sname) // 명령어 확인 QUIT나 EXIT 뒤에 명령어가 없을 경우 ok
                      break;
                  else
