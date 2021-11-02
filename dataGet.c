@@ -83,6 +83,7 @@ void getINFO(MYSQL *conn, int argc, char *argv[],char *content)
   char query[MAXLINE];
   char tok[MAXLINE];
   int cnt = 0;
+  int index = 0;
 
   sscanf(argv[1], "value=%s", name);
 
