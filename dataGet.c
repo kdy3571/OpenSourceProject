@@ -97,11 +97,16 @@ void getINFO(MYSQL *conn, int argc, char *argv[],char *content)
       cnt = atoi(row[2]);
       ave = atof(row[3]);
       max = atof(row[4]);
+      index = 1;
       break;
     }
   }
-  
-  sprintf(content,"%d %.1f %.1f \n", cnt, ave, max);
+  if(index == 0){
+    sprintf(content, "** Cannot find sensor name;%s\n", name);
+  }
+  else {
+    sprintf(content,"%d %.1f %.1f \n", cnt, ave, max);
+  }
 }
 
 void getGET(MYSQL *conn, int argc, char *argv[], char *content)
