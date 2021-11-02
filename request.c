@@ -140,7 +140,7 @@ void requestServeDynamic(rio_t *rio, int fd, char *filename, char *cgiargs, int 
   char buf[MAXBUF];
   char *argv[] = { NULL };
 
-  method = getenv("REQUEST_METHOD");
+  method = Getenv("REQUEST_METHOD");
  
   pid = Fork();
   if(pid == 0) {

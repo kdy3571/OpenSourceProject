@@ -85,7 +85,6 @@ void getINFO(MYSQL *conn, int argc, char *argv[],char *content)
   int cnt = 0;
 
   sscanf(argv[1], "value=%s", name);
-  
 
   if(mysql_query(conn,"SELECT * FROM sensorList"))
     mysql_error_detect(conn);
@@ -198,9 +197,7 @@ void mysql_error_detect(MYSQL *conn){
 
 
 int main(void)
-
 {
-
   int argc;
   char *argv[MAXLINE];
   char content[MAXLINE];
@@ -210,7 +207,5 @@ int main(void)
   getDB(argc, argv, content);
   printf("%s", content);
   
-
   return(0);
-
 }
