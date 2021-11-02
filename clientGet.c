@@ -126,6 +126,7 @@
                      sprintf(query, "command=%s", command);
                      strcat(webaddr, query);
                      userTask(hostname, port, webaddr);
+                     printf("%s", Getenv("GET_REQUEST"));
                  }
                  else
                      printf("%s: value <n> is wrong\n", sname);
@@ -136,6 +137,7 @@
                      sprintf(query, "command=%s&value=%s", command, sname);
                      strcat(webaddr, query);
                      userTask(hostname, port, webaddr);
+                     printf("%s", Getenv("GET_REQUEST"));
                  }
                  else
                      printf("Please enter <sname>\n");
@@ -148,6 +150,7 @@
                              sprintf(query, "NAME=%s&N=%s", sname, n);
                              strcat(webaddr, query);
                              userTask(hostname, port, webaddr);
+                             printf("%s", Getenv("GET_REQUEST"));
                          }
                          else if (isdigit(n[0])) {
                              printf("The number of <n> must exceed zero\n");
