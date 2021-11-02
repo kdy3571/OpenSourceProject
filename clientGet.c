@@ -11,7 +11,7 @@
  *
  * When we test your server, we will be using modifications to this client.
  *
- */ 테스트 중입니다.
+ */
 
 
 #include <stdio.h>
@@ -97,11 +97,11 @@
  void command_shell(char* hostname[], int port)
  {
      char* tok;
-     srand((unsigned)time(NULL));
 
      while (1) {
          char str[MAXLINE], command[MAXLINE], sname[MAXLINE] = { NULL }, n[MAXLINE] = { NULL };
          char webaddr[MAXLINE] = "/dataGet.cgi?";
+         char query[MAXLINE];
 
          printf("#");
          scanf("%[^\n]s%", str);
@@ -124,30 +124,41 @@
 
              if (!strcmp(command, "LIST")) {
                  if (!*sname) { // 명령어 확인 LIST 뒤에 명령어가 더 없으면 ok
-                     strcat(webaddr, strcat("command=", command));
+                     sprintf(query, "command=%s", command);
+                     strcat(webaddr, query);
                      userTask(hostname, port, webaddr);
                  }
                  else
-                     printf("%s: value <n> is wrong\n", check);      
+                     printf("%s: value <n> is wrong\n", sname);
              }
 
              else if (!strcmp(command, "INFO")) {
                  if (*sname) { // 명령어 확인 INFO 뒤에 명령어가 있을 경우 ok
-                     strcat(strcat(strcat(webaddr, strcat("command=", command), "&value="), check);
+                     sprintf(query, "command=%s&value=%s", command, sname);
+                     strcat(webaddr, query);
                      userTask(hostname, port, webaddr);
                  }
-                 else 
+                 else
                      printf("Please enter <sname>\n");
              }
 
              else if (!strcmp(command, "GET")) {
                  if (*sname) { // 명령어 확인 INFO 뒤에 명령어가 있을 경우 ok
-                     if (!*n) { // 명령어 확인 n이 없을 경우 최근 data 1개 아닐 경우 n개 확인
-                         strcat(strcat(webaddr, strcat("NAME=", check), strcat("&N=", n));
-                         userTask(hostname, port, webaddr);
+                     if (*n) { // 명령어 확인 n이 존재하면 최근 data  n개 확인
+                         if (atoi(n)) { // n이 숫자인지 판단
+                             sprintf(query, "NAME=%s&N=%s", sname, n);
+                             strcat(webaddr, query);
+                             userTask(hostname, port, webaddr);
+                         }
+                         else if (isdigit(n[0])) {
+                             printf("The number of <n> must exceed zero\n");
+                         }
+                         else
+                             printf("%s: value <n> is wrong\n", n);
                      }
-                     else {
-                         strcat(strcat(webaddr, strcat("NAME=", check), "&N=1");
+                     else { // 최근 data 1개 확인
+                         sprintf(query, "NAME=%s&N=1", sname);
+                         strcat(webaddr, query);
                          userTask(hostname, port, webaddr);
                      }
                  }
@@ -155,7 +166,7 @@
                      printf("Please enter <sname>\n");
              }
 
-             else if (!strcmp(command, "QUIT")|| !strcmp(command, "EXIT")) {
+             else if (!strcmp(command, "QUIT") || !strcmp(command, "EXIT")) {
                  if (!*sname) // 명령어 확인 QUIT나 EXIT 뒤에 명령어가 없을 경우 ok
                      break;
                  else
