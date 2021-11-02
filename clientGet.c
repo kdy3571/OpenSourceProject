@@ -96,12 +96,11 @@
 
  void command_shell(char* hostname[], int port)
  {
-     char* tok;
-
      while (1) {
          char str[MAXLINE], command[MAXLINE], sname[MAXLINE] = { NULL }, n[MAXLINE] = { NULL };
          char webaddr[MAXLINE] = "/dataGet.cgi?";
          char query[MAXLINE];
+         char* tok;
 
          printf("#");
          scanf("%[^\n]s%", str);
