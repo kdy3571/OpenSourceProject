@@ -26,7 +26,7 @@ server: server.o request.o stems.o
 
 
 clientGet: clientGet.o stems.o
-	$(CC) $(CFLAGS) -o clientGet clientGet.o stems.o $(LIBS)
+	$(CC) $(CFLAGS) -o clientGet clientGet.o stems.o
 
 
 clientPost: clientPost.o stems.o
@@ -38,7 +38,7 @@ dataGet.cgi: dataGet.c stems.h
 
 
 dataPost.cgi: dataPost.c stems.h
-	$(CC) $(CFLAGS) -o dataPost.cgi dataPost.c stems.o
+	$(CC) $(CFLAGS) -o dataPost.cgi dataPost.c stems.o $(LIBS)
 
 .c.o:
 	$(CC) $(CFLAGS) -o $@ -c $<
