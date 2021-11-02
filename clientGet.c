@@ -126,7 +126,6 @@
                      sprintf(query, "command=%s", command);
                      strcat(webaddr, query);
                      userTask(hostname, port, webaddr);
-                     printf("%s", Getenv("GET_REQUEST"));
                  }
                  else
                      printf("%s: value <n> is wrong\n", sname);
