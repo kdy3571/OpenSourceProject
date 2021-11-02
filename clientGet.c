@@ -24,7 +24,7 @@
  /*
   * Send an HTTP request for the specified file
   */
-     void clientSend(int fd, char* filename)
+ void clientSend(int fd, char* filename)
  {
      char buf[MAXLINE];
      char hostname[MAXLINE];
@@ -94,7 +94,7 @@
  }
 
 
- void command_shell(char* hostname[], int port)
+void command_shell(char* hostname[], int port)
  {
      while (1) {
          char str[MAXLINE], command[MAXLINE], sname[MAXLINE] = { NULL }, n[MAXLINE] = { NULL };
@@ -120,7 +120,6 @@
          }
 
          if (tok_num <= 3) {
-
              if (!strcmp(command, "LIST")) {
                  if (!*sname) { // 명령어 확인 LIST 뒤에 명령어가 더 없으면 ok
                      sprintf(query, "command=%s", command);
@@ -136,7 +135,6 @@
                      sprintf(query, "command=%s&value=%s", command, sname);
                      strcat(webaddr, query);
                      userTask(hostname, port, webaddr);
-                     printf("%s", Getenv("GET_REQUEST"));
                  }
                  else
                      printf("Please enter <sname>\n");
@@ -149,7 +147,6 @@
                              sprintf(query, "NAME=%s&N=%s", sname, n);
                              strcat(webaddr, query);
                              userTask(hostname, port, webaddr);
-                             printf("%s", Getenv("GET_REQUEST"));
                          }
                          else if (isdigit(n[0])) {
                              printf("The number of <n> must exceed zero\n");
@@ -166,10 +163,11 @@
                  else
                      printf("Please enter <sname>\n");
              }
-
+          
              else if (!strcmp(command, "QUIT") || !strcmp(command, "EXIT")) {
-                 if (!*sname) // 명령어 확인 QUIT나 EXIT 뒤에 명령어가 없을 경우 ok
+                 if (!*sname){ // 명령어 확인 QUIT나 EXIT 뒤에 명령어가 없을 경우 ok
                      break;
+                     }
                  else
                      printf("%s: no topics match '%s'\n", sname, sname);
              }
@@ -183,12 +181,12 @@
 
  int main(void)
  {
-     char hostname[MAXLINE];
-     int port;
+    char hostname[MAXLINE];
+    int port;
+     
+    getargs_cg(hostname, &port);
 
-     getargs_cg(hostname, &port);
+    command_shell(hostname, port);
 
-     command_shell(hostname, port);
-
-     return(0);
+    return(0);
  }
