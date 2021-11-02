@@ -2,7 +2,7 @@
 #include <sys/time.h>
 #include <assert.h>
 #include <unistd.h>
-#include "/usr/include/mysql/mysql.h"  //mysql include
+#include "/usr/include/mysql/mysql.h"  //mysql include 테스트
 
 void insertdatabase(MYSQL *conn, char* name, char* value, char* time){
   MYSQL_RES *res; //mysql의 결과 한줄을 저장하는 변수
