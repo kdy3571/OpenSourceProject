@@ -1,100 +1,47 @@
 #include "stems.h"
-
 #include <sys/time.h>
-
 #include <assert.h>
-
 #include <unistd.h>
 #include "/usr/include/mysql/mysql.h"
 
-
-
 //
-
 // This program is intended to help you test your web server.
-
 // You can use it to test that you are correctly having multiple 
-
 // threads handling http requests.
-
 //
-
 // htmlReturn() is used if client program is a general web client
-
 // program like Google Chrome. textReturn() is used for a client
-
 // program in a embedded system.
-
 //
-
 // Standalone test:
-
 // # export QUERY_STRING="name=temperature&time=3003.2&value=33.0"
-
 // # ./dataGet.cgi
 
 
 void htmlReturn(void)
-
 {
-
   char content[MAXLINE];
-
   char *buf;
-
   char *ptr;
-
-
-
   /* Make the response body */
-
   sprintf(content, "%s<html>\r\n<head>\r\n", content);
-
   sprintf(content, "%s<title>CGI test result</title>\r\n", content);
-
   sprintf(content, "%s</head>\r\n", content);
-
   sprintf(content, "%s<body>\r\n", content);
-
   sprintf(content, "%s<h2>Welcome to the CGI program</h2>\r\n", content);
-
-  buf = getenv("QUERY_STRING");
-
-  sprintf(content,"%s<p>Env : %s</p>\r\n", content, buf);
-
-  ptr = strsep(&buf, "&");
-
-  while (ptr != NULL){
-
-    sprintf(content, "%s%s\r\n", content, ptr);
-
-    ptr = strsep(&buf, "&");
-
-  }
-
   sprintf(content, "%s</body>\r\n</html>\r\n", content);
-
   
-
   /* Generate the HTTP response */
-
   printf("Content-Length: %d\r\n", strlen(content));
-
   printf("Content-Type: text/html\r\n\r\n");
-
   printf("%s", content);
-
   fflush(stdout);
-
 }
 
 
 
 void textReturn(int *argc, char *argv[])
-
 {
-
-  char content[MAXLINE];
   char *buf;
   char *ptr;
   int index = 0;
@@ -102,14 +49,11 @@ void textReturn(int *argc, char *argv[])
   buf = getenv("QUERY_STRING");
   ptr = strsep(&buf, "&");
   while (ptr != NULL){
-    sprintf(content, "%s\n", ptr);
     argv[index] = ptr;
     ptr = strsep(&buf, "&");
     index++;
   }
-
   *argc = index;
-
 }
 
 void getLIST(MYSQL *conn, int argc, char *argv[],char *content)
@@ -124,8 +68,9 @@ void getLIST(MYSQL *conn, int argc, char *argv[],char *content)
     mysql_error_detect(conn);
 
     while((row = mysql_fetch_row(res)))
-      sprintf(content,"%s%s ",content, row[0]);
-    sprintf(content,"%s\n",content);
+      sprintf(content,"%s%s ", content, row[0]);
+   sprintf(content,"%s\n",content);
+   Setenv("GET_REQUEST", content, 1);
 }
 
 void getINFO(MYSQL *conn, int argc, char *argv[],char *content)
@@ -139,7 +84,7 @@ void getINFO(MYSQL *conn, int argc, char *argv[],char *content)
   char tok[MAXLINE];
   int cnt = 0;
 
-  sscanf(argv[1],"value=%s",name);
+  sscanf(argv[1], "value=%s", name);
   
 
   if(mysql_query(conn,"SELECT * FROM sensorList"))
@@ -150,9 +95,9 @@ void getINFO(MYSQL *conn, int argc, char *argv[],char *content)
 
   while((row = mysql_fetch_row(res))){
     if(!strcmp(row[0], name)){ 
-      cnt = atoi(row[3]);
-      ave = atof(row[4]);
-      max = atof(row[5]);
+      cnt = atoi(row[2]);
+      ave = atof(row[3]);
+      max = atof(row[4]);
       break;
     }
   }
@@ -169,12 +114,12 @@ void getGET(MYSQL *conn, int argc, char *argv[], char *content)
   char sensor[MAXLINE] = "sensor";
   char s_num[5];
   int s_number = 1;
-  int sec = 1;
+  int sec = 0;
   char query[MAXLINE];
   int tableIndex = 0;
-  time_t t_time;
+  long int t;
 
-  sscanf(argv[1], "NAME=%s", name);
+  sscanf(argv[0], "NAME=%s", name);
 
   if(mysql_query(conn, "SELECT * FROM sensorList"))
     mysql_error_detect(conn);
@@ -184,12 +129,12 @@ void getGET(MYSQL *conn, int argc, char *argv[], char *content)
 
   while((row_slist = mysql_fetch_row(res_slist))){
     if(!strcmp(row_slist[0], name)){ 
-      sec = 0;
+      sec = atoi(row_slist[1]);
       break;
     }
-    s_number++;
   }
-  if(sec == 1){
+  
+  if(sec == 0){
     sprintf(content, "** Cannot find sensor name;%s\n", name);
   } 
   else {
@@ -203,13 +148,16 @@ void getGET(MYSQL *conn, int argc, char *argv[], char *content)
     if((res_sensor = mysql_store_result(conn))==NULL)
       mysql_error_detect(conn);
 
-    sscanf(argv[2], "N=%d", &count);      
-    while((row_sensor = mysql_fetch_row(res_sensor))){
-        if(count < tableIndex) 
+    sscanf(argv[1], "N=%d", &count);      
+    int end_point;
+    row_sensor = mysql_fetch_row(res_sensor);
+    end_point = atoi(row_sensor[2]);
+    for (int i = 0; i < count; i++){
+      if(end_point <= i) 
           break;
-        t_time = row_sensor[0];
-        sprintf(content,"%s %s\n", ctime(t_time), row_sensor[1]);
-        tableIndex++;
+      t = atoi(row_sensor[0]);
+      sprintf(content,"%s%s %s\n", content, ctime(t), row_sensor[1]);
+      row_sensor = mysql_fetch_row(res_sensor);
     }
   }
 }
