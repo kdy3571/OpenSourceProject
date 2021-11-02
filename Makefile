@@ -12,7 +12,7 @@ CFLAGS = -g -Wall
 
 
 LIBS = -lpthread 
-LIBS += -lmysqlcient
+LIBS += -lmysqlclient
 
 
 .SUFFIXES: .c .o 
