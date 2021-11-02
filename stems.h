@@ -23,12 +23,14 @@
 #include <netdb.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include "/usr/include/mysql/mysql.h"
 
 
 /* Default file permissions are DEF_MODE & ~DEF_UMASK */
 /* $begin createmasks */
 #define DEF_MODE   S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH
 #define DEF_UMASK  S_IWGRP|S_IWOTH
+#define FIFO "fifo"
 /* $end createmasks */
 
 /* Simplifies calls to bind(), connect(), and accept() */

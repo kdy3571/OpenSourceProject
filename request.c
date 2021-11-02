@@ -140,17 +140,16 @@ void requestServeDynamic(rio_t *rio, int fd, char *filename, char *cgiargs, int 
   char buf[MAXBUF];
   char *argv[] = { NULL };
 
-  method = Getenv("REQUEST_METHOD");
- 
+  method = getenv("REQUEST_METHOD");
   pid = Fork();
   if(pid == 0) {
     Setenv("QUERY_STRING", cgiargs, 1);
     Setenv("REQUEST_METHOD", method, 1);
-  
     if (bodyLength > 0) {
       sprintf(lens, "%d", bodyLength+1);
       Setenv("CONTENT_LENGTH", lens, 1);
       Rio_readlineb(rio, buf, atoi(lens));
+
       Pipe(pfd);
       Write(pfd[1], buf, bodyLength+1);
       Close(pfd[1]);

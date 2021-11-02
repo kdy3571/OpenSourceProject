@@ -8,7 +8,12 @@
  * Get the HTTP response.
  */
 
-
+/*sprintf(query, "UPDATE sensorList set cnt = cnt + 1 WHERE name = '%s'", name);
+    mysql_query(conn, query);
+    sprintf(query, "UPDATE sensorList L, sensorCal C SET L.ave = C.avg WHERE L.name = C.name");
+    mysql_query(conn, query);
+    sprintf(query, "UPDATE sensorList L JOIN sensorCal C ON L.max < C.value SET L.max = C.value WHERE L.Name = C.name");
+    mysql_query(conn, query);*/
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <pthread.h>
@@ -73,7 +78,7 @@ void userTask(char *myname, char *hostname, int port, char *filename, long int t
   int clientfd;
   char msg[MAXLINE];
 
-  sprintf(msg, "name=%s&time=%ld&value=%.5f", myname, time, value);
+  sprintf(msg, "name=%s&time=%ld&value=%.1f", myname, time, value);
   clientfd = Open_clientfd(hostname, port);
   clientSend(clientfd, filename, msg);
   clientPrint(clientfd);
@@ -189,6 +194,7 @@ void command_shell(char *myname, char *hostname, int port, char *filename, float
               userTask(myname, hostname, port, filename, t, *value);
               sleep(1);
             }
+            *value = temp;
           }
           else {
             if (isdigit(check[0]) || atoi(check) < 0)
