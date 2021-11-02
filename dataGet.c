@@ -17,12 +17,17 @@
 // # export QUERY_STRING="name=temperature&time=3003.2&value=33.0"
 // # ./dataGet.cgi
 
+void mysql_error_detect(MYSQL *conn){
+  fprintf(stderr, "%s\n", mysql_error(conn));
+  mysql_close(conn);
+  exit(1);
+}
 
-void htmlReturn(void)
+void htmlReturn(char *content)
 {
-  char content[MAXLINE];
   char *buf;
   char *ptr;
+
   /* Make the response body */
   sprintf(content, "%s<html>\r\n<head>\r\n", content);
   sprintf(content, "%s<title>CGI test result</title>\r\n", content);
@@ -38,21 +43,22 @@ void htmlReturn(void)
   fflush(stdout);
 }
 
-
-
 void textReturn(int *argc, char *argv[])
 {
+  char content[MAXLINE];
   char *buf;
   char *ptr;
   int index = 0;
 
   buf = getenv("QUERY_STRING");
+  sprintf(content,"%sEnv : %s\n", content, buf);
   ptr = strsep(&buf, "&");
   while (ptr != NULL){
     argv[index] = ptr;
     ptr = strsep(&buf, "&");
     index++;
   }
+
   *argc = index;
 }
 
@@ -70,7 +76,6 @@ void getLIST(MYSQL *conn, int argc, char *argv[],char *content)
     while((row = mysql_fetch_row(res)))
       sprintf(content,"%s%s ", content, row[0]);
    sprintf(content,"%s\n",content);
-   Setenv("GET_REQUEST", content, 1);
 }
 
 void getINFO(MYSQL *conn, int argc, char *argv[],char *content)
@@ -86,6 +91,7 @@ void getINFO(MYSQL *conn, int argc, char *argv[],char *content)
   int index = 0;
 
   sscanf(argv[1], "value=%s", name);
+  
 
   if(mysql_query(conn,"SELECT * FROM sensorList"))
     mysql_error_detect(conn);
@@ -121,8 +127,8 @@ void getGET(MYSQL *conn, int argc, char *argv[], char *content)
   int s_number = 1;
   int sec = 0;
   char query[MAXLINE];
-  int tableIndex = 0;
-  long int t;
+  int tableIndex = 1;
+  time_t t;
 
   sscanf(argv[0], "NAME=%s", name);
 
@@ -154,17 +160,15 @@ void getGET(MYSQL *conn, int argc, char *argv[], char *content)
       mysql_error_detect(conn);
 
     sscanf(argv[1], "N=%d", &count);      
-    int end_point;
-    row_sensor = mysql_fetch_row(res_sensor);
-    end_point = atoi(row_sensor[2]);
-    for (int i = 0; i < count; i++){
-      if(end_point <= i) 
-          break;
+    while((row_sensor = mysql_fetch_row(res_sensor))){
+      if(count < tableIndex) 
+        break;
       t = atoi(row_sensor[0]);
+      char* time = ctime(&t);
       char *ptr = strstr(time, "\n\0");
       strcpy(ptr, "");
       sprintf(content,"%s%s %s\n", content, time, row_sensor[1]);
-      row_sensor = mysql_fetch_row(res_sensor);
+      tableIndex++;
     }
   }
 }
@@ -186,7 +190,7 @@ void getDB(int argc, char *argv[],char *content)
   if(mysql_query(conn, "USE PROJECT"))
     mysql_error_detect(conn);
   
-  if(!strcasecmp("command=LIST",argv[0])) 
+  if(!strcasecmp("command=LIST",argv[0]))
     getLIST(conn,argc,argv,content);
   else if(!strcasecmp("command=INFO",argv[0])) 
     getINFO(conn,argc,argv,content);
@@ -196,24 +200,16 @@ void getDB(int argc, char *argv[],char *content)
   mysql_close(conn);
 }
 
-
-void mysql_error_detect(MYSQL *conn){
-  fprintf(stderr, "%s\n", mysql_error(conn));
-  mysql_close(conn);
-  exit(1);
-}
-
-
 int main(void)
 {
   int argc;
   char *argv[MAXLINE];
   char content[MAXLINE];
-  //htmlReturn();
   
   textReturn(&argc, argv);
   getDB(argc, argv, content);
-  printf("%s", content);
+
+  printf("%s",content);
   
   return(0);
 }
