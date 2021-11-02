@@ -165,11 +165,11 @@
                      printf("Please enter <sname>\n");
              }
 
-             else if (!strcmp(command, "QUIT") || !strcmp(command, "EXIT")) {
+             else if (!strcmp(command, "QUIT") || !strcmp(command, "EXIT")) {W
                  if (!*sname) // 명령어 확인 QUIT나 EXIT 뒤에 명령어가 없을 경우 ok
                      break;
                  else
-                     printf("%s: no topics match '%s'\n", check, check);
+                     printf("%s: no topics match '%s'\n", sname, sname);
              }
              else
                  printf("%s: command not found\n", command);
