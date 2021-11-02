@@ -193,7 +193,7 @@ void getDB(int argc, char *argv[],char *content)
 int main(void)
 {
   int argc;
-  char *argv[MAXLINE_ARGS];
+  char *argv[MAXLINE];
   char content[MAXLINE];
   //htmlReturn();
   
