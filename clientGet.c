@@ -52,7 +52,7 @@
      /* Read and display the HTTP Header */
      n = Rio_readlineb(&rio, buf, MAXBUF);
      while (strcmp(buf, "\r\n") && (n > 0)) {
-         printf("Header: %s", buf);
+         printf("%s", buf);
          n = Rio_readlineb(&rio, buf, MAXBUF);
 
          /* If you want to look for certain HTTP tags... */
