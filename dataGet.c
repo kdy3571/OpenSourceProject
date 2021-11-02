@@ -1,51 +1,99 @@
 #include "stems.h"
+
 #include <sys/time.h>
+
 #include <assert.h>
+
 #include <unistd.h>
+#include "/usr/include/mysql/mysql.h"
+
+
+
 //
+
 // This program is intended to help you test your web server.
+
 // You can use it to test that you are correctly having multiple 
+
 // threads handling http requests.
+
 //
+
 // htmlReturn() is used if client program is a general web client
+
 // program like Google Chrome. textReturn() is used for a client
+
 // program in a embedded system.
+
 //
+
 // Standalone test:
+
 // # export QUERY_STRING="name=temperature&time=3003.2&value=33.0"
+
 // # ./dataGet.cgi
+
 
 void htmlReturn(void)
 
 {
+
   char content[MAXLINE];
+
   char *buf;
+
   char *ptr;
-  
+
+
+
   /* Make the response body */
+
   sprintf(content, "%s<html>\r\n<head>\r\n", content);
+
   sprintf(content, "%s<title>CGI test result</title>\r\n", content);
+
   sprintf(content, "%s</head>\r\n", content);
+
   sprintf(content, "%s<body>\r\n", content);
+
   sprintf(content, "%s<h2>Welcome to the CGI program</h2>\r\n", content);
+
   buf = getenv("QUERY_STRING");
+
   sprintf(content,"%s<p>Env : %s</p>\r\n", content, buf);
+
   ptr = strsep(&buf, "&");
+
   while (ptr != NULL){
+
     sprintf(content, "%s%s\r\n", content, ptr);
+
     ptr = strsep(&buf, "&");
+
   }
+
   sprintf(content, "%s</body>\r\n</html>\r\n", content);
 
+  
+
   /* Generate the HTTP response */
+
   printf("Content-Length: %d\r\n", strlen(content));
+
   printf("Content-Type: text/html\r\n\r\n");
+
   printf("%s", content);
+
   fflush(stdout);
+
 }
 
+
+
 void textReturn(int *argc, char *argv[])
+
 {
+
   char content[MAXLINE];
   char *buf;
   char *ptr;
@@ -59,7 +107,9 @@ void textReturn(int *argc, char *argv[])
     ptr = strsep(&buf, "&");
     index++;
   }
+
   *argc = index;
+
 }
 
 void getLIST(MYSQL *conn, int argc, char *argv[],char *content)
@@ -70,7 +120,7 @@ void getLIST(MYSQL *conn, int argc, char *argv[],char *content)
   if(mysql_query(conn,"SELECT * FROM sensorList"))
     mysql_error_detect(conn);
   
-  if((sql_result = mysql_store_result(conn))==NULL)
+  if((res = mysql_store_result(conn))==NULL)
     mysql_error_detect(conn);
 
     while((row = mysql_fetch_row(res)))
@@ -84,6 +134,7 @@ void getINFO(MYSQL *conn, int argc, char *argv[],char *content)
   MYSQL_ROW row;
 
   float max = 0, ave = 0;
+  char name[MAXLINE];
   char query[MAXLINE];
   char tok[MAXLINE];
   int cnt = 0;
@@ -98,10 +149,10 @@ void getINFO(MYSQL *conn, int argc, char *argv[],char *content)
     mysql_error_detect(conn);
 
   while((row = mysql_fetch_row(res))){
-    if(!strcmp(row[0],name)){ 
-      cnt = row[3];
-      ave = row[4];
-      max = row[5];
+    if(!strcmp(row[0], name)){ 
+      cnt = atoi(row[3]);
+      ave = atof(row[4]);
+      max = atof(row[5]);
       break;
     }
   }
@@ -190,8 +241,18 @@ void getDB(int argc, char *argv[],char *content)
   mysql_close(conn);
 }
 
+
+void mysql_error_detect(MYSQL *conn){
+  fprintf(stderr, "%s\n", mysql_error(conn));
+  mysql_close(conn);
+  exit(1);
+}
+
+
 int main(void)
+
 {
+
   int argc;
   char *argv[MAXLINE];
   char content[MAXLINE];
@@ -201,5 +262,7 @@ int main(void)
   getDB(argc, argv, content);
   printf("%s", content);
   
+
   return(0);
+
 }
