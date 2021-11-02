@@ -155,7 +155,9 @@ void getGET(MYSQL *conn, int argc, char *argv[], char *content)
       if(end_point <= i) 
           break;
       t = atoi(row_sensor[0]);
-      sprintf(content,"%s%s %s\n", content, ctime(t), row_sensor[1]);
+      char *ptr = strstr(time, "\n\0");
+      strcpy(ptr, "");
+      sprintf(content,"%s%s %s\n", content, time, row_sensor[1]);
       row_sensor = mysql_fetch_row(res_sensor);
     }
   }
