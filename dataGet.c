@@ -166,8 +166,8 @@ void getGET(MYSQL *conn, int argc, char *argv[], char *content)
       t = atoi(row_sensor[0]);
       char* time = ctime(&t);
       char *ptr = strstr(time, "\n\0");
-      strcpy(ptr, "");
-      sprintf(content,"%s%s %s\n", content, time, row_sensor[1]);
+      strcpy(ptr, " ");
+      sprintf(content,"%s%s%s\n", time, row_sensor[1], content);
       tableIndex++;
     }
   }
