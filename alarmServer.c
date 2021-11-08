@@ -3,7 +3,7 @@
 
 void getargs_ps(int *port)
 {
-	/*config-ps ÆÄÀÏ ÀĞ¾î¿È*/
+	/*config-ps íŒŒì¼ì„ ì½ì–´ì˜¨ë‹¤*/
 	FILE *fp;
 
 	if ((fp = fopen("config-ps.txt", "r")) == NULL)
@@ -21,7 +21,7 @@ void consumer(int connfd, long arrivalTime)
 
 int main(void)
 {
-	/*server.c¿Í Å©°Ô ´Ù¸¥°Ô ¾øÀ½*/
+	/*server.cì™€ í¬ê²Œ ë‹¤ë¥´ì§€ ì•Šë‹¤*/
 	int listenfd, connfd, port, clientlen;
 	struct sockaddr_in clientaddr;
 	
