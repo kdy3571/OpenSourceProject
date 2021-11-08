@@ -37,7 +37,7 @@ alarmServer: alarmServer.o stems.h
 	$(CC) $(CFLAGS) -o alarmServer alarmServer.o request.o stems.o $(LIBS)
 
 alarm.cgi: alarm.c stems.h
-	$(CC) $(CFLAGS) -o alarm.cgi alarm.c
+	$(CC) $(CFLAGS) -o alarm.cgi alarm.c stems.o
 	
 .c.o:
 	$(CC) $(CFLAGS) -o $@ -c $<
