@@ -149,6 +149,7 @@ void requestServeDynamic(rio_t *rio, int fd, char *filename, char *cgiargs, int 
       sprintf(lens, "%d", bodyLength+1);
       Setenv("CONTENT_LENGTH", lens, 1);
       Rio_readlineb(rio, buf, atoi(lens));
+      Setenv("CONTENT_BODY", buf, 1);
 
       Pipe(pfd);
       Write(pfd[1], buf, bodyLength+1);
