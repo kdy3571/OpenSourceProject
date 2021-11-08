@@ -2,7 +2,7 @@
 # To compile, type "make" or make "all"
 # To remove files, type "make clean"
 #
-OBJS = server.o request.o stems.o clientGet.o clientPost.o
+OBJS = server.o request.o stems.o clientGet.o clientPost.o alarmclient.o alarmServer.o
 TARGET = server
 
 CC = gcc
@@ -13,7 +13,7 @@ LIBS += -lmysqlclient
 
 .SUFFIXES: .c .o 
 
-all: server clientPost clientGet dataGet.cgi dataPost.cgi
+all: server clientPost clientGet dataGet.cgi dataPost.cgi alarmclient alarmServer alarm.cgi
 
 server: server.o request.o stems.o
 	$(CC) $(CFLAGS) -o server server.o request.o stems.o $(LIBS)
@@ -29,7 +29,16 @@ dataGet.cgi: dataGet.c stems.h
 
 dataPost.cgi: dataPost.c stems.h stems.o
 	$(CC) $(CFLAGS) -o dataPost.cgi dataPost.c stems.o $(LIBS)
+	
+alarmclient: alarmclient.o stems.h
+	$(CC) $(CFLAGS) -o alarmclient alarmclient.o stems.o $(LIBS)
+	
+alarmServer: alarmServer.o stems.h
+	$(CC) $(CFLAGS) -o alarmServer alarmServer.o request.o stems.o $(LIBS)
 
+alarm.cgi: alarm.c stems.h
+	$(CC) $(CFLAGS) -o alarm.cgi alarm.c
+	
 .c.o:
 	$(CC) $(CFLAGS) -o $@ -c $<
 
@@ -38,4 +47,4 @@ clientGet.o: stems.h
 clientPost.o: stems.h
 
 clean:
-	-rm -f $(OBJS) server clientPost clientGet dataGet.cgi dataPost.cgi
+	-rm -f $(OBJS) server clientPost clientGet dataGet.cgi dataPost.cgi alarmclient alarmServer alarm.cgi
