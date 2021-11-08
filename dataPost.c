@@ -5,24 +5,24 @@
 #include "/usr/include/mysql/mysql.h"  //mysql include
 
 void insertdatabase(MYSQL *conn, char* name, char* value, char* time){
-  MYSQL_RES *res; //mysqlÀÇ °á°ú ÇÑÁÙÀ» ÀúÀåÇÏ´Â º¯¼ö
-  MYSQL_ROW row;  //mysqlµ¥ÀÌÅÍ ÇÏ³ª¸¦ ÀúÀåÇÏ´Â º¯¼ö
-  int s_number = 1;  //sensor Å×ÀÌºíÀ» ±¸ºĞÇÏ´Â º¯¼ö
-  char sensor[MAXLINE] = "sensor";  //sensor Å×ÀÌºí ¾Õ¿¡ ºÙÀ» ¹®ÀÚ¿­
-  char s_num[5];  //s_number¸¦ ³ÖÀ» ¹è¿­
-  char query[MAXLINE];  //mysql_query¿Í sprintf¸¦ ÀÌ¿ëÇÏ±âÀ§ÇÑ ¹è¿­
-  int sec = 1;  //°ªÀ» ÃÖÃÊ·Î ³Ö´ÂÁö ¾Æ´ÑÁö ±¸ºĞÇÏ±â À§ÇÑ º¯¼ö
+  MYSQL_RES *res; //mysqlì˜ ê²°ê³¼ í•œì¤„ì„ ì €ì¥í•˜ëŠ” ë³€ìˆ˜
+  MYSQL_ROW row;  //mysqlë°ì´í„° í•˜ë‚˜ë¥¼ ì €ì¥í•˜ëŠ” ë³€ìˆ˜
+  int s_number = 1;  //sensor í…Œì´ë¸”ì„ êµ¬ë¶„í•˜ëŠ” ë³€ìˆ˜
+  char sensor[MAXLINE] = "sensor";  //sensor í…Œì´ë¸” ì•ì— ë¶™ì„ ë¬¸ìì—´
+  char s_num[5];  //s_numberë¥¼ ë„£ì„ ë°°ì—´
+  char query[MAXLINE];  //mysql_queryì™€ sprintfë¥¼ ì´ìš©í•˜ê¸°ìœ„í•œ ë°°ì—´
+  int sec = 1;  //ê°’ì„ ìµœì´ˆë¡œ ë„£ëŠ”ì§€ ì•„ë‹Œì§€ êµ¬ë¶„í•˜ê¸° ìœ„í•œ ë³€ìˆ˜
   
-  if(mysql_query(conn, "SELECT * FROM sensorList")){  //sensorList Å×ÀÌºí »ı¼º
+  if(mysql_query(conn, "SELECT * FROM sensorList")){  //sensorList í…Œì´ë¸” ìƒì„±
     mysql_query(conn, "CREATE TABLE sensorList (name varchar(80) not null, id int(2) not null AUTO_INCREMENT, \
         cnt int(2) not null, ave float not null, max float not null, PRIMARY KEY (id))AUTO_INCREMENT = 1;");
     mysql_query(conn, "SELECT * FROM sensorList");
   }
   
-  res = mysql_store_result(conn); //mysql¿¡ ³ª¿Â °á°ú¸¦ ÀúÀåÇÑ´Ù.
+  res = mysql_store_result(conn); //mysqlì— ë‚˜ì˜¨ ê²°ê³¼ë¥¼ ì €ì¥í•œë‹¤.
   
-  while((row = mysql_fetch_row(res))){ //³ª¿Â °á°ú¸¦ ÇÑÁÙ¾¿ ºÒ·¯¿Í ´Ü¾î ÇÏ³ªÇÏ³ª·Î ³ª´«´Ù.   //°ªÀÌ ¾øÀ¸¸é 0 ÀÖÀ¸¸é Æ÷ÀÎÅÍ°ª
-    if(!strcasecmp(row[0], name)){  //Ã¹ ´Ü¾î°¡ name°ú °°À» °æ¿ì
+  while((row = mysql_fetch_row(res))){ //ë‚˜ì˜¨ ê²°ê³¼ë¥¼ í•œì¤„ì”© ë¶ˆëŸ¬ì™€ ë‹¨ì–´ í•˜ë‚˜í•˜ë‚˜ë¡œ ë‚˜ëˆˆë‹¤.   //ê°’ì´ ì—†ìœ¼ë©´ 0 ìˆìœ¼ë©´ í¬ì¸í„°ê°’
+    if(!strcasecmp(row[0], name)){  //ì²« ë‹¨ì–´ê°€ nameê³¼ ê°™ì„ ê²½ìš°
       sec = 0;
       break;
     }
@@ -30,31 +30,32 @@ void insertdatabase(MYSQL *conn, char* name, char* value, char* time){
   }
   
   sprintf(s_num, "%d", s_number);
-  strcat(sensor, s_num);  //sensor ¹®ÀÚ¿­°ú s_number¸¦ °áÇÕ
+  strcat(sensor, s_num);  //sensor ë¬¸ìì—´ê³¼ s_numberë¥¼ ê²°í•©
   
   if(sec == 0){
-    sprintf(query, "INSERT INTO %s VALUES('%s', %s, NULL)", sensor, time, value);  //sensorx Å×ÀÌºí¿¡ °ªÀ» ³ÖÀ½
+    sprintf(query, "INSERT INTO %s VALUES('%s', %s, NULL)", sensor, time, value);  //sensorx í…Œì´ë¸”ì— ê°’ì„ ë„£ìŒ
     mysql_query(conn, query);
     
-    sprintf(query, "UPDATE sensorList set cnt = cnt + 1 WHERE name = '%s'", name);  //sensorList Å×ÀÌºíÀÇ cnt °ªÀ» 1 ¿Ã¸²
+    sprintf(query, "UPDATE sensorList set cnt = cnt + 1 WHERE name = '%s'", name);  //sensorList í…Œì´ë¸”ì˜ cnt ê°’ì„ 1 ì˜¬ë¦¼
     mysql_query(conn, query);
-    sprintf(query, "UPDATE sensorList SET ave = (SELECT AVG(value) FROM %s) WHERE name = '%s'", sensor, name); //sensorList Å×ÀÌºíÀÇ ave¿¡ Æò±Õ°ª ÀúÀå
+    sprintf(query, "UPDATE sensorList SET ave = (SELECT AVG(value) FROM %s) WHERE name = '%s'", sensor, name); //sensorList í…Œì´ë¸”ì˜ aveì— í‰ê· ê°’ ì €ì¥
     mysql_query(conn, query);
-    sprintf(query, "UPDATE sensorList SET max = IF(max < %s, %s, max) WHERE name = '%s'", value, value, name); //sensorList Å×ÀÌºíÀÇ max¿¡ ÃÖ´ë°ª ÀúÀå
+    sprintf(query, "UPDATE sensorList SET max = IF(max < %s, %s, max) WHERE name = '%s'", value, value, name); //sensorList í…Œì´ë¸”ì˜ maxì— ìµœëŒ€ê°’ ì €ì¥
     mysql_query(conn, query);
   }
-  else{ //sec == 1 ÃÖÃÊ·Î °ªÀ» Áı¾î³ÖÀ» °æ¿ì
+  else{ //sec == 1 ìµœì´ˆë¡œ ê°’ì„ ì§‘ì–´ë„£ì„ ê²½ìš°
     sprintf(query, "CREATE TABLE %s (time varchar(15) not null, value float not null, idx int(2) not null AUTO_INCREMENT, \
-        PRIMARY KEY (idx))AUTO_INCREMENT = 1;", sensor); //sensorx Å×ÀÌºí »ı¼º
+        PRIMARY KEY (idx))AUTO_INCREMENT = 1;", sensor); //sensorx í…Œì´ë¸” ìƒì„±
     mysql_query(conn, query);
     
-    sprintf(query, "INSERT INTO %s VALUES('%s', %s, null)", sensor, time, value); //sensorx Å×ÀÌºí¿¡ °ªÀ» ³ÖÀ½
+    sprintf(query, "INSERT INTO %s VALUES('%s', %s, null)", sensor, time, value); //sensorx í…Œì´ë¸”ì— ê°’ì„ ë„£ìŒ
     mysql_query(conn, query);
     
-    sprintf(query, "INSERT INTO sensorList VALUES('%s', id, 1, %s, %s)", name, value, value);  //sensorList¿¡ °ªÀ» ³ÖÀ½
+    sprintf(query, "INSERT INTO sensorList VALUES('%s', id, 1, %s, %s)", name, value, value);  //sensorListì— ê°’ì„ ë„£ìŒ
     mysql_query(conn, query);
   }
-  printf("200 OK\n");  //¸ğµç °ªµéÀ» µ¥ÀÌÅÍº£ÀÌ½º¿¡ ÀúÀåÇÏ°í Ãâ·Â
+  printf("200 OK\n");  //ëª¨ë“  ê°’ë“¤ì„ ë°ì´í„°ë² ì´ìŠ¤ì— ì €ì¥í•˜ê³  ì¶œë ¥
+  fflush(stdout);
 }
 
 void initdb(void){
@@ -68,41 +69,74 @@ void initdb(void){
   lens = atoi(len);
   
   /************database************/
-  Read(STDIN_FILENO, buf, lens);  //buf°ªÀ» ºÒ·¯¿Â´Ù.
+  Read(STDIN_FILENO, buf, lens);  //bufê°’ì„ ë¶ˆëŸ¬ì˜¨ë‹¤.
   
   char name[MAXLINE];  
   char value[MAXLINE];
   char time[MAXLINE];
   
-  MYSQL *conn = mysql_init(NULL);  //mysql ÃÊ±âÈ­
-  char password[MAXLINE] = "1234";  //mysql ºñ¹Ğ¹øÈ£
+  MYSQL *conn = mysql_init(NULL);  //mysql ì´ˆê¸°í™”
+  char password[MAXLINE] = "1234";  //mysql ë¹„ë°€ë²ˆí˜¸
   
-  if (mysql_real_connect(conn,"127.0.0.1", "root", password, NULL , 0, NULL, 0) == NULL){  //mysql ¿¬°á
+  if (mysql_real_connect(conn,"127.0.0.1", "root", password, NULL , 0, NULL, 0) == NULL){  //mysql ì—°ê²°
     mysql_error(conn);
   }
     
-  if (mysql_query(conn, "USE PROJECT")){  //mysqlÄÜ¼ÖÃ¢¿¡ ¾²´Â ¸í·É¾î¸¦ ÀÔ·ÂÇÏ´Â ÇÔ¼ö, ¼º°øÇÏ¸é TRUE ½ÇÆĞÇÏ¸é FALSE ¹İÈ¯
-    mysql_query(conn, "CREATE DATABASE PROJECT");  //µ¥ÀÌÅÍº£ÀÌ½º »ı¼º
+  if (mysql_query(conn, "USE PROJECT")){  //mysqlì½˜ì†”ì°½ì— ì“°ëŠ” ëª…ë ¹ì–´ë¥¼ ì…ë ¥í•˜ëŠ” í•¨ìˆ˜, ì„±ê³µí•˜ë©´ TRUE ì‹¤íŒ¨í•˜ë©´ FALSE ë°˜í™˜
+    mysql_query(conn, "CREATE DATABASE PROJECT");  //ë°ì´í„°ë² ì´ìŠ¤ ìƒì„±
     mysql_query(conn, "USE PROJECT");
   }
   
   strtok(buf, "="); 
-  sprintf(name, "%s", strtok(NULL, "&"));  //strtok¸¦ ÀÌ¿ëÇÏ¿© name ±¸ºĞ
+  sprintf(name, "%s", strtok(NULL, "&"));  //strtokë¥¼ ì´ìš©í•˜ì—¬ name êµ¬ë¶„
   
   strtok(NULL, "=");
-  sprintf(time, "%s", strtok(NULL, "&"));  //strtok¸¦ ÀÌ¿ëÇÏ¿© time ±¸ºĞ
+  sprintf(time, "%s", strtok(NULL, "&"));  //strtokë¥¼ ì´ìš©í•˜ì—¬ time êµ¬ë¶„
 
   strtok(NULL, "=");
-  sprintf(value, "%s", strtok(NULL, "&"));  //strtok¸¦ ÀÌ¿ëÇÏ¿© value ±¸ºĞ
+  sprintf(value, "%s", strtok(NULL, "&"));  //strtokë¥¼ ì´ìš©í•˜ì—¬ value êµ¬ë¶„
 
-  insertdatabase(conn, name, value, time); //±¸ºĞÇÑ °ªÀ» µ¥ÀÌÅÍº£ÀÌ½º¿¡ ³Ö´Â ÇÔ¼ö
-  
+  insertdatabase(conn, name, value, time); //êµ¬ë¶„í•œ ê°’ì„ ë°ì´í„°ë² ì´ìŠ¤ì— ë„£ëŠ” í•¨ 
   mysql_close(conn);
+}
+
+void namedpipe(void){
+  int named_pipe;
+  char body[MAXLINE];
+  char buf[MAXBUF];
   
+  sprintf(buf, "%s", Getenv("CONTENT_BODY"));
+  strcpy(body, buf);
+  int pipeLength = strlen(body);
+  
+  if(mkfifo(FIFO, 0666) == -1){  //named pipe íŠ¹ìˆ˜ íŒŒì¼ì¸ FIFO ë¥¼ ìƒì„±í•˜ëŠ” ë¶€ë¶„
+    if(unlink(FIFO) == -1){  //ë§Œì•½ FIFOê°€ ìˆë‹¤ë©´ ì§€ì›Œì¤€ë‹¤.
+      printf("Dosen't delete\n");
+      exit(0);
+    }
+    if(mkfifo(FIFO, 0666) == -1){  //ì§€ìš´ í›„ ë‹¤ì‹œ ìƒì„±
+      printf("Cannot make pipe.\n");
+      exit(0);
+    }
+    named_pipe = Open(FIFO,O_RDWR,O_TRUNC);  //FIFO ê°œë°©
+  }
+  else 
+    named_pipe = Open(FIFO,O_RDWR,O_TRUNC);  //FIFO ê°œë°©
+  if((Write(named_pipe, (int *)&pipeLength, sizeof(int))) == -1){
+    printf("fail write\n");  //ê°’ì˜ ê¸¸ì´ë¥¼ ë¨¼ì € ì¨ì¤€ë‹¤.
+    exit(0);
+  }
+  if((Write(named_pipe, body, pipeLength)) == -1){
+    printf("fail write\n");  //ê°’ì„ ì¨ ì¤€ë‹¤.
+    exit(0);
+  }
+  sleep(1);
+  Close(named_pipe);
 }
 
 int main(int argc, char *argv[])
 {
   initdb();
+  namedpipe();
   return(0);
 }
