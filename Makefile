@@ -45,6 +45,8 @@ alarm.cgi: alarm.c stems.h
 server.o: stems.h request.h
 clientGet.o: stems.h
 clientPost.o: stems.h
+alarmClietn.o: stems.h
+pushServer.o: stems.h
 
 clean:
 	-rm -f $(OBJS) server clientPost clientGet dataGet.cgi dataPost.cgi alarmclient alarmServer alarm.cgi
