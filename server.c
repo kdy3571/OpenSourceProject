@@ -38,12 +38,12 @@ int main(void)
   getargs_ws(&port);
 
   listenfd = Open_listenfd(port);
-  pid = fork();
-  if(pid == 0){
+  pid = fork(); //프로세스 생성
+  if(pid == 0){ //자식
     Execve("./alarmclient", NULL, NULL);
   }
   else{
-    while (1) {
+    while (1) { //부모
       clientlen = sizeof(clientaddr);
       connfd = Accept(listenfd, (SA *)&clientaddr, (socklen_t *) &clientlen);
       consumer(connfd, getWatch());
