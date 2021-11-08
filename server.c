@@ -40,7 +40,7 @@ int main(void)
   listenfd = Open_listenfd(port);
   pid = fork(); //프로세스 생성
   if(pid == 0){ //자식
-    Execve("./alarmclient", NULL, NULL);
+    Execve("./alarmClient", NULL, NULL);
   }
   else{
     while (1) { //부모
