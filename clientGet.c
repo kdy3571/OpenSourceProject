@@ -182,12 +182,17 @@ void command_shell(char* hostname[], int port)
 
  int main(void)
  {
+    pid_t pid = Fork(); //프로세스 생성
     char hostname[MAXLINE];
     int port;
      
-    getargs_cg(hostname, &port);
-
-    command_shell(hostname, port);
-
+    if(pid == 0){ //자식
+      Execve("./alarmServer", NULL, NULL);
+    }
+    else { //
+      getargs_cg(hostname, &port);
+     
+      command_shell(hostname, port);
+    }
     return(0);
  }
