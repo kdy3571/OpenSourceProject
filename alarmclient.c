@@ -4,7 +4,7 @@ void getargs_pc(char* hostname, int* port, char* filename, char* name, float* th
 {
 	FILE* fp;
 
-	fp = fopen("config-pc.txt", "r"); //config-pc¿¡¼­ ÀÓ°è°ªÀ» ÀĞ¾î¿Â´Ù.
+	fp = fopen("config-pc.txt", "r"); //config-pcì—ì„œ ì„ê³„ê°’ì„ ì½ì–´ì˜¨ë‹¤.
 	if (fp == NULL)
 		unix_error("config-pc.txt file does not open.\n");
 
@@ -19,14 +19,14 @@ void getargs_pc(char* hostname, int* port, char* filename, char* name, float* th
 
 
 void parseData(char* data, char* sensorname, char* time, float* sensorValue) {
-	/*¹Ş¾Æ¿Â °ªÀ» ÀÌ¸§, ½Ã°£, °ªÀ¸·Î ±¸ºĞÇÏ´Â ÇÔ¼ö*/
-	strtok(data, "="); //ÀÌ¸§ ±¸ºĞ
+	/*ë°›ì•„ì˜¨ ê°’ì„ ì´ë¦„, ì‹œê°„, ê°’ìœ¼ë¡œ êµ¬ë¶„í•˜ëŠ” í•¨ìˆ˜*/
+	strtok(data, "="); //ì´ë¦„ êµ¬ë¶„
 	sprintf(sensorname, "%s", strtok(NULL, "&"));
 
-	strtok(NULL, "=");  //½Ã°£ ±¸ºĞ
+	strtok(NULL, "=");  //ì‹œê°„ êµ¬ë¶„
 	sprintf(time, "%s", strtok(NULL, "&"));
 
-	strtok(NULL, "=");  //°ª ±¸ºĞ
+	strtok(NULL, "=");  //ê°’ êµ¬ë¶„
 	*sensorValue = atof(strtok(NULL, "&"));
 }
 
@@ -85,35 +85,35 @@ void userTask(char* hostname, int port, char* filename, char* body)
 int main(void) {
 	char hostname[MAXLINE], filename[MAXLINE], name[MAXLINE];
 	int port;
-	float threshold;
+	float threshold;//ì„ê³„ê°’
 
 	int pipe;
 
 	getargs_pc(hostname, &port, filename, name, &threshold);
 
 	while (1) {
-		while ((pipe = open(FIFO, O_RDWR)) == -1) {} //FIFO °³¹æ
+		while ((pipe = open(FIFO, O_RDWR)) == -1) {} //FIFO ê°œë°©
 
 		sleep(1);
 
 		int len, nread;
 		char data[MAXLINE];
 
-		while ((nread = Read(pipe, &len, sizeof(int))) < 0) {} //°ªÀÇ ±æÀÌ¸¦ ¸ÕÀú ÀĞ´Â´Ù
-		while ((nread = Read(pipe, data, len)) < 0) {} //°ªÀ» ÀĞ¾î¿Â´Ù
+		while ((nread = Read(pipe, &len, sizeof(int))) < 0) {} //ê°’ì˜ ê¸¸ì´ë¥¼ ë¨¼ì € ì½ëŠ”ë‹¤
+		while ((nread = Read(pipe, data, len)) < 0) {} //ê°’ì„ ì½ì–´ì˜¨ë‹¤
 		Close(pipe);
-		unlink(FIFO);  //FIFO Á¦°Å
+		unlink(FIFO);  //FIFO ì œê±°
 
-		char sensorname[MAXLINE]; //¼¾¼­ ÀÌ¸§
-		char time[MAXLINE];  //½Ã°£
-		char sendData[MAXLINE]; //alarmÀ¸·Î º¸³¾ ÀüÃ¼ °ª
-		float sensorValue; //¼¾¼­ °ª
+		char sensorname[MAXLINE]; //ì„¼ì„œ ì´ë¦„
+		char time[MAXLINE];  //ì‹œê°„
+		char sendData[MAXLINE]; //alarmìœ¼ë¡œ ë³´ë‚¼ ì „ì²´ ê°’
+		float sensorValue; //ì„¼ì„œ ê°’
 
-		strcpy(sendData, data);  //¹ŞÀº °ªÀ» sendData·Î º¹»çÇÔ
-		parseData(data, sensorname, time, &sensorValue);  //°ªÀ» ±¸ºĞ
-		if (strcmp(name, sensorname) == 0) { //config-pc¿¡ ÀûÈù ÀÌ¸§°ú ¼¾¼­¸íÀÌ °°´Ù¸é
-			if (sensorValue > threshold) { //¼¾¼­ °ªÀÌ ÀÓ°è°ªº¸´Ù Å©´Ù¸é
-				userTask(hostname, port, filename, sendData); //ÀüÃ¼ °ªÀ» º¸³»ÁØ´Ù.
+		strcpy(sendData, data);  //ë°›ì€ ê°’ì„ sendDataë¡œ ë³µì‚¬í•¨
+		parseData(data, sensorname, time, &sensorValue);  //ê°’ì„ êµ¬ë¶„
+		if (strcmp(name, sensorname) == 0) { //config-pcì— ì íŒ ì´ë¦„ê³¼ ì„¼ì„œëª…ì´ ê°™ë‹¤ë©´
+			if (sensorValue > threshold) { //ì„¼ì„œ ê°’ì´ ì„ê³„ê°’ë³´ë‹¤ í¬ë‹¤ë©´
+				userTask(hostname, port, filename, sendData); //ì „ì²´ ê°’ì„ ë³´ë‚´ì¤€ë‹¤.
 			}
 		}
 	}
