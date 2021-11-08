@@ -170,34 +170,75 @@ void getGET(MYSQL *conn, int argc, char *argv[], char *content)
       sprintf(content,"%s%s%s\n", time, row_sensor[1], content);
       tableIndex++;
     }
-  }
+ }
 }
 
-void getDB(int argc, char *argv[],char *content)
+void getGET(MYSQL *conn, int argc, char *argv[], char *content)
 {
-  MYSQL *conn = mysql_init(NULL); 
-  
-  char password[MAXLINE] = "1234";
+  MYSQL_RES *res_slist, *res_sensor;
+  MYSQL_ROW row_slist, row_sensor;
+  char name[MAXLINE];
+  int count; 
+  char sensor[MAXLINE] = "sensor";
+  char s_num[5];
+  int s_number = 1;
+  int sec = 0;
+  char query[MAXLINE];
+  int tableIndex = 1;
+  time_t t;
+
+  sscanf(argv[0], "NAME=%s", name);
+
+  if(mysql_query(conn, "SELECT * FROM sensorList"))
+    mysql_error_detect(conn);
     
-  if(conn==NULL){
-    fprintf(stderr,"%s\n",mysql_error(conn));
-    exit(1);
+  if((res_slist = mysql_store_result(conn))==NULL)
+    mysql_error_detect(conn);
+
+  while((row_slist = mysql_fetch_row(res_slist))){
+    if(!strcmp(row_slist[0], name)){ 
+      sec = atoi(row_slist[1]);
+      break;
+    }
   }
   
-  if(mysql_real_connect(conn,"localhost", "root", password, NULL, 0, NULL, 0) == NULL)
-    mysql_error_detect(conn);
-  
-  if(mysql_query(conn, "USE PROJECT"))
-    mysql_error_detect(conn);
-  
-  if(!strcasecmp("command=LIST",argv[0]))
-    getLIST(conn,argc,argv,content);
-  else if(!strcasecmp("command=INFO",argv[0])) 
-    getINFO(conn,argc,argv,content);
-  else //GET
-    getGET(conn,argc,argv,content);
+  if(sec == 0){
+    sprintf(content, "** Cannot find sensor name;%s\n", name);
+  } 
+  else {
+    sprintf(s_num, "%d", s_number);
+    strcat(sensor, s_num);
+    sprintf(query,"SELECT * FROM %s ORDER BY idx DESC",sensor);
 
-  mysql_close(conn);
+    if(mysql_query(conn,query))
+      mysql_error_detect(conn);
+
+    if((res_sensor = mysql_store_result(conn))==NULL)
+      mysql_error_detect(conn);
+
+    sscanf(argv[1], "N=%d", &count);
+    if (row_sensor = mysql_fetch_row(res_sensor)) {
+    	t = atoi(row_sensor[0]);
+	    char* time = ctime(&t);
+    	char *ptr = strstr(time, "\n");
+ 	    strcpy(ptr, " ");
+    	sprintf(content, "%s%s\n", time, row_sensor[1]);
+    	
+    	while((row_sensor = mysql_fetch_row(res_sensor))){
+    	  if(count <= tableIndex)
+    	  	break;
+        char cont[MAXLINE];
+    	  sprintf(cont, "%s", content);
+    	  t = atoi(row_sensor[0]);
+	      char* time = ctime(&t);
+    	  char *ptr = strstr(time, "\n");
+ 	      strcpy(ptr, " ");
+        
+    	  sprintf(content, "%s%s\n%s", time, row_sensor[1], cont);
+      	  tableIndex++;
+    	}
+    }
+  }
 }
 
 int main(void)
