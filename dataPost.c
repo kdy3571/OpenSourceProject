@@ -60,6 +60,7 @@ void insertdatabase(MYSQL *conn, char* name, char* value, char* time){
 
 void initdb(void){
   char buf[MAXBUF];
+  char buff[MAXBUF];
   char len[MAXBUF];
   int lens;
   
@@ -70,6 +71,7 @@ void initdb(void){
   
   /************database************/
   Read(STDIN_FILENO, buf, lens);  //buf값을 불러온다.
+  strcpy(buff, buf);
   
   char name[MAXLINE];  
   char value[MAXLINE];
@@ -96,38 +98,39 @@ void initdb(void){
   strtok(NULL, "=");
   sprintf(value, "%s", strtok(NULL, "&"));  //strtok를 이용하여 value 구분
 
-  insertdatabase(conn, name, value, time); //구분한 값을 데이터베이스에 넣는 함 
+  insertdatabase(conn, name, value, time); //구분한 값을 데이터베이스에 넣는 함수
+  
   mysql_close(conn);
+  
+  namedpipe(buff); //named pipe 연결 함수
 }
 
-void namedpipe(void){
+void namedpipe(char* buf){
   int named_pipe;
   char body[MAXLINE];
-  char buf[MAXBUF];
   
-  sprintf(buf, "%s", Getenv("CONTENT_BODY"));
-  strcpy(body, buf);
+  strcpy(body, buf); //buf값을 body로 복사
   int pipeLength = strlen(body);
   
-  if(mkfifo(FIFO, 0666) == -1){  //named pipe 특수 파일인 FIFO 를 생성하는 부분
-    if(unlink(FIFO) == -1){  //만약 FIFO가 있다면 지워준다.
+  if(mkfifo(FIFO, 0666) == -1){ //named pipe 특수파일인 FIFO를 생성
+    if(unlink(FIFO) == -1){ //FIFO가 존재하면 삭제
       printf("Dosen't delete\n");
       exit(0);
     }
-    if(mkfifo(FIFO, 0666) == -1){  //지운 후 다시 생성
+    if(mkfifo(FIFO, 0666) == -1){ //삭제 후 다시 생성
       printf("Cannot make pipe.\n");
       exit(0);
     }
-    named_pipe = Open(FIFO,O_RDWR,O_TRUNC);  //FIFO 개방
+    named_pipe = Open(FIFO,O_RDWR,O_TRUNC); //FIFO 개방
   }
   else 
-    named_pipe = Open(FIFO,O_RDWR,O_TRUNC);  //FIFO 개방
+    named_pipe = Open(FIFO,O_RDWR,O_TRUNC); //FIFO 개방
   if((Write(named_pipe, (int *)&pipeLength, sizeof(int))) == -1){
-    printf("fail write\n");  //값의 길이를 먼저 써준다.
+    printf("fail write\n"); //값의 길이를 먼저 넣어줌
     exit(0);
   }
   if((Write(named_pipe, body, pipeLength)) == -1){
-    printf("fail write\n");  //값을 써 준다.
+    printf("fail write\n"); //값을 넣어줌
     exit(0);
   }
   sleep(1);
@@ -137,6 +140,5 @@ void namedpipe(void){
 int main(int argc, char *argv[])
 {
   initdb();
-  namedpipe();
   return(0);
 }
