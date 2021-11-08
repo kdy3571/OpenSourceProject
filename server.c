@@ -30,6 +30,7 @@ void consumer(int connfd, long arrivalTime)
 
 int main(void)
 {
+  pid_t pid;
   int listenfd, connfd, port, clientlen;
   struct sockaddr_in clientaddr;
 
@@ -37,10 +38,16 @@ int main(void)
   getargs_ws(&port);
 
   listenfd = Open_listenfd(port);
-  while (1) {
-    clientlen = sizeof(clientaddr);
-    connfd = Accept(listenfd, (SA *)&clientaddr, (socklen_t *) &clientlen);
-    consumer(connfd, getWatch());
+  pid = fork();
+  if(pid == 0){
+    Execve("./alarmclient", NULL, NULL);
+  }
+  else{
+    while (1) {
+      clientlen = sizeof(clientaddr);
+      connfd = Accept(listenfd, (SA *)&clientaddr, (socklen_t *) &clientlen);
+      consumer(connfd, getWatch());
+    }
   }
   return(0);
 }
