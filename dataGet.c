@@ -170,7 +170,34 @@ void getGET(MYSQL *conn, int argc, char *argv[], char *content)
       sprintf(content,"%s%s%s\n", time, row_sensor[1], content);
       tableIndex++;
     }
- }
+  }
+}
+
+void getDB(int argc, char *argv[],char *content)
+{
+  MYSQL *conn = mysql_init(NULL); 
+  
+  char password[MAXLINE] = "1234";
+    
+  if(conn==NULL){
+    fprintf(stderr,"%s\n",mysql_error(conn));
+    exit(1);
+  }
+  
+  if(mysql_real_connect(conn,"localhost", "root", password, NULL, 0, NULL, 0) == NULL)
+    mysql_error_detect(conn);
+  
+  if(mysql_query(conn, "USE PROJECT"))
+    mysql_error_detect(conn);
+  
+  if(!strcasecmp("command=LIST",argv[0]))
+    getLIST(conn,argc,argv,content);
+  else if(!strcasecmp("command=INFO",argv[0])) 
+    getINFO(conn,argc,argv,content);
+  else //GET
+    getGET(conn,argc,argv,content);
+
+  mysql_close(conn);
 }
 
 int main(void)
