@@ -10,7 +10,7 @@ CFLAGS = -g -Wall
 
 LIBS = -lpthread
 LIBS += -lmysqlclient
-LNC_PATH = -I/usr/include/mysqldb -I/usr/include/mysqldb/mysql
+LNC_PATH = -I/usr/include/mysql -I/usr/include/mysql/mysql
 
 .SUFFIXES: .c .o 
 
