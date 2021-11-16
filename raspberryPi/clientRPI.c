@@ -146,7 +146,6 @@ int main(void)
 	int port;
 	float period;
  
-	printf("test1\n"); 
 	getargs_pi(hostname, &port, filename, &period);
 	
 	printf("dht11 Raspberry pi\n"); 
