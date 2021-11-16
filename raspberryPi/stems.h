@@ -23,7 +23,7 @@
 #include <netdb.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include "/usr/include/mysql/mysql.h"
+#include "/usr/include/mariadb/mysql.h"
 
 
 /* Default file permissions are DEF_MODE & ~DEF_UMASK */
