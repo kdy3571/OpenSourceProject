@@ -134,7 +134,7 @@ void getGET(MYSQL *conn, int argc, char *argv[], char *content)
 
   if(mysql_query(conn, "SELECT * FROM sensorList"))
     mysql_error_detect(conn);
-    
+
   if((res_slist = mysql_store_result(conn))==NULL)
     mysql_error_detect(conn);
 
@@ -143,15 +143,16 @@ void getGET(MYSQL *conn, int argc, char *argv[], char *content)
       sec = atoi(row_slist[1]);
       break;
     }
+    s_number++;
   }
-  
+
   if(sec == 0){
     sprintf(content, "** Cannot find sensor name;%s\n", name);
   } 
   else {
     sprintf(s_num, "%d", s_number);
     strcat(sensor, s_num);
-    sprintf(query,"SELECT * FROM %s ORDER BY idx DESC",sensor);
+    sprintf(query,"SELECT * FROM %s ORDER BY idx DESC", sensor);
 
     if(mysql_query(conn,query))
       mysql_error_detect(conn);
@@ -159,19 +160,31 @@ void getGET(MYSQL *conn, int argc, char *argv[], char *content)
     if((res_sensor = mysql_store_result(conn))==NULL)
       mysql_error_detect(conn);
 
-    sscanf(argv[1], "N=%d", &count);      
-    while((row_sensor = mysql_fetch_row(res_sensor))){
-      if(count < tableIndex) 
-        break;
-      t = atoi(row_sensor[0]);
-      char* time = ctime(&t);
-      char *ptr = strstr(time, "\n\0");
-      strcpy(ptr, " ");
-      sprintf(content,"%s%s%s\n", time, row_sensor[1], content);
-      tableIndex++;
+    sscanf(argv[1], "N=%d", &count);
+    if (row_sensor = mysql_fetch_row(res_sensor)) {
+    	t = atoi(row_sensor[0]);
+	    char* time = ctime(&t);
+    	char *ptr = strstr(time, "\n");
+ 	    strcpy(ptr, " ");
+    	sprintf(content, "%s%s\n", time, row_sensor[1]);
+
+    	while((row_sensor = mysql_fetch_row(res_sensor))){
+    	  if(count <= tableIndex)
+    	  	break;
+        char cont[MAXLINE];
+    	  sprintf(cont, "%s", content);
+    	  t = atoi(row_sensor[0]);
+	      char* time = ctime(&t);
+    	  char *ptr = strstr(time, "\n");
+ 	      strcpy(ptr, " ");
+
+    	  sprintf(content, "%s%s\n%s", time, row_sensor[1], cont);
+      	  tableIndex++;
+    	}
     }
   }
 }
+
 
 void getDB(int argc, char *argv[],char *content)
 {
