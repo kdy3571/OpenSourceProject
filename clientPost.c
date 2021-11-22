@@ -89,6 +89,7 @@ void userTask(char* myname, char* hostname, int port, char* filename, long int t
     clientSend(clientfd, filename, msg);
     clientPrint(clientfd);
     Close(clientfd);
+    
 }
 
 void getargs_cp()
@@ -118,7 +119,7 @@ void command_shell()
     while (1) {
         char str[MAXLINE], command[MAXLINE], check[MAXLINE] = { NULL };
 
-        printf(">>");
+        printf(">>\n");
         scanf("%[^\n]s%", str);
         getchar();
 
@@ -254,6 +255,7 @@ void command_shell()
 void* producer(void* arg) {
     long int start_t = time(NULL);
     struct timespec begin, end;
+    char *msg;
 
     clock_gettime(CLOCK_MONOTONIC, &begin);
 
@@ -265,10 +267,10 @@ void* producer(void* arg) {
     else
         value = value - (float)(rand() % 100 + 1) / 10;
 
-    userTask(myname, hostname, port, filename, t, value);
+    userTask(myname, hostname, port, filename, (double)t / 1000000, value);
 
     clock_gettime(CLOCK_MONOTONIC, &end);
-    t = start_t * 1000000 + (double)((end.tv_sec - begin.tv_sec) + (end.tv_nsec - begin.tv_nsec)) / 1000;
+    t = start_t * 1000000 + (double)((end.tv_sec + begin.tv_nsec)) / 1000;
     printf("Thread 응답 시간: %ld\n", t);
 }
 
