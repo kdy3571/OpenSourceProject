@@ -213,18 +213,18 @@ void command_shell(char* myname, char* hostname, int port, char* filename, float
                     if (atoi(check) > 0) {
                         random = atoi(check);
                         float temp = *value;
-                        
+
                         struct timespec begin, end;
                         clock_gettime(CLOCK_MONOTONIC, &begin);
                         for (int i = 0; i < random; i++) {
-                            *value = temp; 
+                            *value = temp;
                             if (rand() % 2)
                                 *value = *value + (float)(rand() % 100 + 1) / 10;
                             else
                                 *value = *value - (float)(rand() % 100 + 1) / 10;
                             clock_gettime(CLOCK_MONOTONIC, &end);
-                            t = (end.tv_sec - begin.tv_sec) + (end.tv_nsec - begin.tv_nsec)
-                            userTask(myname, hostname, port, filename, t, *value);
+                            t = (end.tv_sec - begin.tv_sec) + (end.tv_nsec - begin.tv_nsec);
+                                userTask(myname, hostname, port, filename, t, *value);
                         }
                         *value = temp;
                     }
