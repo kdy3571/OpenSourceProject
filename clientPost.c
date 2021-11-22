@@ -222,7 +222,7 @@ void command_shell()
                         pthread_t* thread = (pthread_t*)malloc(sizeof(pthread_t) * random);
                         for (int i = 0; i < random; i++) {
                             float temp = value;
-                            pthread_create(&thread[i], NULL, producer, NULL);
+                            pthread_create(&thread[i], NULL, producer, (void*)(i + 1));
                             value = temp;
                         }
                     }
@@ -253,14 +253,14 @@ void command_shell()
 }
 
 void* producer(void* arg) {
-    long int start_t = time(NULL);
+    int num = (int*)arg;
     struct timespec begin, end;
     char *msg;
 
-    clock_gettime(CLOCK_MONOTONIC, &begin);
+    clock_gettime(CLOCK_REALTIME, &begin);
 
-    long int t = start_t * 1000000 + (begin.tv_sec + begin.tv_nsec) / 1000;
-    printf("Thread 시작 시간: %ld\n", t);
+    long int t = begin.tv_sec * 1000000 + begin.tv_nsec / 1000;
+    printf("Thread%d 시작 시각: %ld\n", num, t);
 
     if (rand() % 2)
         value = value + (float)(rand() % 100 + 1) / 10;
@@ -269,9 +269,11 @@ void* producer(void* arg) {
 
     userTask(myname, hostname, port, filename, (double)t / 1000000, value);
 
-    clock_gettime(CLOCK_MONOTONIC, &end);
-    t = start_t * 1000000 + (double)(end.tv_sec + end.tv_nsec) / 1000;
-    printf("Thread 응답 시간: %ld\n", t);
+    clock_gettime(CLOCK_REALTIME, &end);
+    t = end.tv_sec * 1000000 + end.tv_nsec / 1000;
+    printf("Thread%d 응답 시각: %ld\n", num, t);
+    t = (end.tv_sec - begin.tv_sec) * 1000000 + (end.tv_nsec - begin.tv_nsec) / 1000;
+    printf("Thread%d 응답 시간: %ld\n", num, t);
 }
 
 int main(void)
