@@ -19,37 +19,22 @@ pthread_t *thread;
 
 
 void getargs_ws(int *port, int *P, int *N)
-
 {
-
   FILE *fp;
-
-
-
   if ((fp = fopen("config-ws.txt", "r")) == NULL)
-
     unix_error("config-ws.txt file does not open.");
-
-
 
   fscanf(fp, "%d", port);
   fscanf(fp, "%d", P);
   fscanf(fp, "%d", N);
 
   fclose(fp);
-
 }
 
-
-
 void consumer(int connfd, long arrivalTime)
-
 {
-
   requestHandle(connfd, arrivalTime);
-
   Close(connfd);
-
 }
 
 
@@ -106,16 +91,10 @@ void Producer(void *ptr){
 
 
 int main(void)
-
 {
-
   pid_t pid;
-
   int listenfd, connfd, port, clientlen;
-
   struct sockaddr_in clientaddr;
-
-
 
   initWatch();
 
@@ -127,9 +106,6 @@ int main(void)
   sem_init(&mutex, 0, 1);
   sem_init(&full, 0, 0);
   sem_init(&empty, 0, N);
-
-
-
   listenfd = Open_listenfd(port);
 
   pid = fork(); //프로세스 생성
@@ -141,7 +117,6 @@ int main(void)
   }
 
   else{
-
     while (1) { //부모
       for(int i = 0; i < P; i++){
         if(pthread_create(&thread[i], NULL, Producer, NULL)){
@@ -152,12 +127,9 @@ int main(void)
       
       while(1) {
         clientlen = sizeof(clientaddr);
-
         connfd = Accept(listenfd, (SA *)&clientaddr, (socklen_t *) &clientlen);
-
         SendData(connfd, getWatch);
       }
-      
       for(int i = 0; i < P; i++)
         pthread_detach(thread[i]);
     }
