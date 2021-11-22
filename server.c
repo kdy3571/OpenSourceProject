@@ -88,8 +88,6 @@ void Producer(void *ptr){
 	}
 }
 
-
-
 int main(void)
 {
   pid_t pid;
@@ -111,11 +109,8 @@ int main(void)
   pid = fork(); //프로세스 생성
 
   if(pid == 0){ //자식
-
     Execve("./alarmClient", NULL, NULL);
-
   }
-
   else{
     while (1) { //부모
       for(int i = 0; i < P; i++){
@@ -124,7 +119,6 @@ int main(void)
           exit(1);
         }
       }
-      
       while(1) {
         clientlen = sizeof(clientaddr);
         connfd = Accept(listenfd, (SA *)&clientaddr, (socklen_t *) &clientlen);
