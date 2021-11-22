@@ -219,9 +219,9 @@ void command_shell()
                 if (*check) {
                     if (atoi(check) > 0) {
                         random = atoi(check);
-                        pthread_t *thread = (pthread_t*)malloc(sizeof(pthread_t) * random);
+                        pthread_t* thread = (pthread_t*)malloc(sizeof(pthread_t) * random);
                         for (int i = 0; i < random; i++)
-                            pthread_create(&thread[i], NULL, producer, (void *)&i);
+                            pthread_create(&thread[i], NULL, producer, (void*)&i);
                     }
                     else {
                         if (isdigit(check[0]) || atoi(check) < 0)
