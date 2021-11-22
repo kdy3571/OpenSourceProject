@@ -220,7 +220,7 @@ void command_shell()
                         random = atoi(check);
                         pthread_t* thread = (pthread_t*)malloc(sizeof(pthread_t) * random);
                         for (int i = 0; i < random; i++)
-                            long int t = time(NULL)
+                            t = time(NULL)
                             pthread_create(&thread[i], NULL, producer, (void*)&t);
                     }
                     else {
@@ -250,8 +250,8 @@ void command_shell()
 }
 
 void* producer(void* arg) {
-    long int start_t = *(long int *)arg
-    float temp = value;
+    long int start_t = *(long int*)arg
+        float temp = value;
     struct timespec begin, end;
 
     clock_gettime(CLOCK_MONOTONIC, &begin);
