@@ -25,6 +25,13 @@
 #include "stems.h"
 #include <ctype.h>
 
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+char myname[MAXLINE], hostname[MAXLINE], filename[MAXLINE];
+int port;
+float value;    // thread 사용을 위해 전역 변수화
+
+void* producer(void* arg);
+
 void clientSend(int fd, char* filename, char* body)
 {
     char buf[MAXLINE];
@@ -85,7 +92,7 @@ void userTask(char* myname, char* hostname, int port, char* filename, long int t
     Close(clientfd);
 }
 
-void getargs_cp(char* myname, char* hostname, int* port, char* filename, float* value)
+void getargs_cp()
 {
     FILE* fp;
 
@@ -93,15 +100,15 @@ void getargs_cp(char* myname, char* hostname, int* port, char* filename, float* 
     if (fp == NULL)
         unix_error("config-cp.txt file does not open.");
 
-    fscanf(fp, "%s", myname);
-    fscanf(fp, "%s", hostname);
-    fscanf(fp, "%d", port);
-    fscanf(fp, "%s", filename);
-    fscanf(fp, "%f", value);
+    fscanf(fp, "%s", &myname);
+    fscanf(fp, "%s", &hostname);
+    fscanf(fp, "%d", &port);
+    fscanf(fp, "%s", &filename);
+    fscanf(fp, "%f", &value);
     fclose(fp);
 }
 
-void command_shell(char* myname, char* hostname, int port, char* filename, float* value)
+void command_shell()
 {
     char* tok;
     int random;
@@ -156,25 +163,25 @@ void command_shell(char* myname, char* hostname, int port, char* filename, float
             else if (!strcmp(command, "value")) {
                 if (*check) {
                     if (atof(check)) {
-                        *value = atof(check);
-                        printf("Sensor value is changed to %.5f\n", *value);
+                        value = atof(check);
+                        printf("Sensor value is changed to %.1f\n", value);
                     }
                     else
                         if (isdigit(check[0])) {
-                            *value = atof(check);
-                            printf("Sensor value is changed to %.5f\n", *value);
+                            value = atof(check);
+                            printf("Sensor value is changed to %.1f\n", value);
                         }
                         else
                             printf("%s: value <n> is wrong\n", check);
                 }
                 else
-                    printf("Current sensor is %.5f\n", *value);
+                    printf("Current sensor is %.1f\n", value);
             }
 
             else if (!strcmp(command, "send")) {
                 if (!*check) {
                     t = time(NULL);
-                    userTask(myname, hostname, port, filename, t, *value);
+                    userTask(myname, hostname, port, filename, t, value);
                 }
                 else
                     printf("send: no send topics match '%s'\n", check);
@@ -184,18 +191,18 @@ void command_shell(char* myname, char* hostname, int port, char* filename, float
                 if (*check) {
                     if (atoi(check) > 0) {
                         random = atoi(check);
-                        float temp = *value;
+                        float temp = value;
                         for (int i = 0; i < random; i++) {
-                            *value = temp;
+                            value = temp;
                             t = time(NULL);
                             if (rand() % 2)
-                                *value = *value + (float)(rand() % 100 + 1) / 10;
+                                value = value + (float)(rand() % 100 + 1) / 10;
                             else
-                                *value = *value - (float)(rand() % 100 + 1) / 10;
-                            userTask(myname, hostname, port, filename, t, *value);
+                                value = value - (float)(rand() % 100 + 1) / 10;
+                            userTask(myname, hostname, port, filename, t, value);
                             sleep(1);
                         }
-                        *value = temp;
+                        value = temp;
                     }
                     else {
                         if (isdigit(check[0]) || atoi(check) < 0)
@@ -212,21 +219,9 @@ void command_shell(char* myname, char* hostname, int port, char* filename, float
                 if (*check) {
                     if (atoi(check) > 0) {
                         random = atoi(check);
-                        float temp = *value;
-
-                        struct timespec begin, end;
-                        clock_gettime(CLOCK_MONOTONIC, &begin);
-                        for (int i = 0; i < random; i++) {
-                            *value = temp;
-                            if (rand() % 2)
-                                *value = *value + (float)(rand() % 100 + 1) / 10;
-                            else
-                                *value = *value - (float)(rand() % 100 + 1) / 10;
-                            clock_gettime(CLOCK_MONOTONIC, &end);
-                            t = (end.tv_sec - begin.tv_sec) + (end.tv_nsec - begin.tv_nsec);
-                                userTask(myname, hostname, port, filename, t, *value);
-                        }
-                        *value = temp;
+                        pthread_t *thread = (pthread_t*)malloc(sizeof(pthread_t) * random);
+                        for (int i = 0; i < random; i++)
+                            pthread_create(&thread[i], NULL, producer, (void *)&i);
                     }
                     else {
                         if (isdigit(check[0]) || atoi(check) < 0)
@@ -254,15 +249,38 @@ void command_shell(char* myname, char* hostname, int port, char* filename, float
     }
 }
 
+void* producer(void* arg) {
+    float temp = value;
+    struct timespec begin, end;
+
+    clock_gettime(CLOCK_MONOTONIC, &begin);
+
+    pthread_mutex_lock(&mutex);
+
+    long int t = time(NULL); // micro second
+    printf("Thread 시작 시간: %ld\n", t * 1000000);
+
+    if (rand() % 2)
+        value = value + (float)(rand() % 100 + 1) / 10;
+    else
+        value = value - (float)(rand() % 100 + 1) / 10;
+
+    printf("value: %.1f\n", value);
+    userTask(myname, hostname, port, filename, t, value);
+
+    pthread_mutex_unlock(&mutex);
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    t = t * 1000000 + (double)((end.tv_sec - begin.tv_sec) + (end.tv_nsec - begin.tv_nsec)) / 1000;
+    printf("Thread 응답 시간: %ld\n", t);
+    value = temp;
+}
+
 int main(void)
 {
-    char myname[MAXLINE], hostname[MAXLINE], filename[MAXLINE];
-    int port;
-    float value;
+    getargs_cp();
 
-    getargs_cp(myname, hostname, &port, filename, &value);
-
-    command_shell(myname, hostname, port, filename, &value);
+    command_shell();
 
     return(0);
 }
