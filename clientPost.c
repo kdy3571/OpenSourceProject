@@ -119,7 +119,7 @@ void command_shell()
     while (1) {
         char str[MAXLINE], command[MAXLINE], check[MAXLINE] = { NULL };
 
-        printf(">>\n");
+        //printf(">>\n");
         scanf("%[^\n]s%", str);
         getchar();
 
@@ -270,7 +270,7 @@ void* producer(void* arg) {
     userTask(myname, hostname, port, filename, (double)t / 1000000, value);
 
     clock_gettime(CLOCK_MONOTONIC, &end);
-    t = start_t * 1000000 + (double)((end.tv_sec + begin.tv_nsec)) / 1000;
+    t = start_t * 1000000 + (double)(end.tv_sec + end.tv_nsec) / 1000;
     printf("Thread 응답 시간: %ld\n", t);
 }
 
