@@ -219,9 +219,11 @@ void command_shell()
                     if (atoi(check) > 0) {
                         random = atoi(check);
                         pthread_t* thread = (pthread_t*)malloc(sizeof(pthread_t) * random);
-                        for (int i = 0; i < random; i++)
-                            t = time(NULL)
-                            pthread_create(&thread[i], NULL, producer, (void*)&t);
+                        for (int i = 0; i < random; i++) {
+                            float temp = value;
+                            pthread_create(&thread[i], NULL, producer, NULL);
+                            value = temp;
+                        }
                     }
                     else {
                         if (isdigit(check[0]) || atoi(check) < 0)
@@ -250,14 +252,13 @@ void command_shell()
 }
 
 void* producer(void* arg) {
-    long int start_t = *(long int*)arg
-        float temp = value;
+    long int start_t = time(NULL);
     struct timespec begin, end;
 
     clock_gettime(CLOCK_MONOTONIC, &begin);
 
     long int t = start_t * 1000000 + (begin.tv_sec + begin.tv_nsec) / 1000;
-    printf("Thread 시작 시간: %ld\n", t * 1000000);
+    printf("Thread 시작 시간: %ld\n", t);
 
     if (rand() % 2)
         value = value + (float)(rand() % 100 + 1) / 10;
@@ -269,8 +270,6 @@ void* producer(void* arg) {
     clock_gettime(CLOCK_MONOTONIC, &end);
     t = start_t * 1000000 + (double)((end.tv_sec - begin.tv_sec) + (end.tv_nsec - begin.tv_nsec)) / 1000;
     printf("Thread 응답 시간: %ld\n", t);
-
-    value = temp;
 }
 
 int main(void)
