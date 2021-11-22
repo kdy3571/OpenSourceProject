@@ -25,7 +25,6 @@
 #include "stems.h"
 #include <ctype.h>
 
-pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 char myname[MAXLINE], hostname[MAXLINE], filename[MAXLINE];
 int port;
 float value;    // thread 사용을 위해 전역 변수화
@@ -221,7 +220,8 @@ void command_shell()
                         random = atoi(check);
                         pthread_t* thread = (pthread_t*)malloc(sizeof(pthread_t) * random);
                         for (int i = 0; i < random; i++)
-                            pthread_create(&thread[i], NULL, producer, (void*)&i);
+                            long int t = time(NULL)
+                            pthread_create(&thread[i], NULL, producer, (void*)&t);
                     }
                     else {
                         if (isdigit(check[0]) || atoi(check) < 0)
@@ -250,14 +250,13 @@ void command_shell()
 }
 
 void* producer(void* arg) {
+    long int start_t = *(long int *)arg
     float temp = value;
     struct timespec begin, end;
 
     clock_gettime(CLOCK_MONOTONIC, &begin);
 
-    pthread_mutex_lock(&mutex);
-
-    long int t = time(NULL); // micro second
+    long int t = start_t * 1000000 + (begin.tv_sec + begin.tv_nsec) / 1000;
     printf("Thread 시작 시간: %ld\n", t * 1000000);
 
     if (rand() % 2)
@@ -265,14 +264,12 @@ void* producer(void* arg) {
     else
         value = value - (float)(rand() % 100 + 1) / 10;
 
-    printf("value: %.1f\n", value);
     userTask(myname, hostname, port, filename, t, value);
 
-    pthread_mutex_unlock(&mutex);
-
     clock_gettime(CLOCK_MONOTONIC, &end);
-    t = t * 1000000 + (double)((end.tv_sec - begin.tv_sec) + (end.tv_nsec - begin.tv_nsec)) / 1000;
+    t = start_t * 1000000 + (double)((end.tv_sec - begin.tv_sec) + (end.tv_nsec - begin.tv_nsec)) / 1000;
     printf("Thread 응답 시간: %ld\n", t);
+
     value = temp;
 }
 
