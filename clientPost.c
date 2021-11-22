@@ -226,10 +226,7 @@ void command_shell(char *myname, char *hostname, int port, char *filename, float
                         printf("%s: random <n> is wrong\n", check);
                 }
             }
-<<<<<<<<< Temporary merge branch 1
-=========
         }
->>>>>>>>> Temporary merge branch 2
         else
           printf("Please enter <n>\n");
       }
