@@ -203,6 +203,29 @@ void command_shell(char *myname, char *hostname, int port, char *filename, float
               printf("%s: random <n> is wrong\n", check);
           }
         }
+        else if (!strcmp(command, "prand")) {
+            if (*check) {
+                if (atoi(check) > 0) {
+                    random = atoi(check);
+                    float temp = *value;
+                    for (int i = 0; i < random; i++) {
+                        *value = temp;
+                        t = time(NULL);
+                        if (rand() % 2)
+                            *value = *value + (float)(rand() % 100 + 1) / 10;
+                        else
+                            *value = *value - (float)(rand() % 100 + 1) / 10;
+                        userTask(myname, hostname, port, filename, t, *value);
+                    }
+                    *value = temp;
+                }
+                else {
+                    if (isdigit(check[0]) || atoi(check) < 0)
+                        printf("<n> must be a valid integer greater than 0\n");
+                    else
+                        printf("%s: random <n> is wrong\n", check);
+                }
+            }
         else
           printf("Please enter <n>\n");
       }
