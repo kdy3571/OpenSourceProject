@@ -203,6 +203,7 @@ void command_shell(char *myname, char *hostname, int port, char *filename, float
               printf("%s: random <n> is wrong\n", check);
           }
         }
+
         else if (!strcmp(command, "prand")) {
             if (*check) {
                 if (atoi(check) > 0) {
@@ -227,6 +228,7 @@ void command_shell(char *myname, char *hostname, int port, char *filename, float
                 }
             }
         }
+
         else
           printf("Please enter <n>\n");
       }
