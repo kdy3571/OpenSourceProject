@@ -27,7 +27,7 @@
 
 char myname[MAXLINE], hostname[MAXLINE], filename[MAXLINE];
 int port;
-float value;    // thread 사용을 위해 전역 변수화
+float value;   
 
 void* producer(void* arg);
 
@@ -260,7 +260,7 @@ void* producer(void* arg) {
     clock_gettime(CLOCK_REALTIME, &begin);
 
     long int t = begin.tv_sec * 1000000 + begin.tv_nsec / 1000;
-    printf("Thread%d 시작 시각: %ld\n", num, t);
+    printf("Thread%d start: %ld\n", num, t);
 
     if (rand() % 2)
         value = value + (float)(rand() % 100 + 1) / 10;
@@ -271,9 +271,9 @@ void* producer(void* arg) {
 
     clock_gettime(CLOCK_REALTIME, &end);
     t = end.tv_sec * 1000000 + end.tv_nsec / 1000;
-    printf("Thread%d 응답 시각: %ld\n", num, t);
+    printf("Thread%d end: %ld\n", num, t);
     t = (end.tv_sec - begin.tv_sec) * 1000000 + (end.tv_nsec - begin.tv_nsec) / 1000;
-    printf("Thread%d 응답 시간: %ld\n", num, t);
+    printf("Thread%d minus: %ld\n", num, t);
 }
 
 int main(void)
