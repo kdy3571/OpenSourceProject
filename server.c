@@ -81,10 +81,9 @@ void ReceveData(int *connfd, long *time) { // consumer : worker thread
 void Producer(void *ptr){
 	int connfd;
 	long time;
-	ReceveData(&connfd, &time);
 	while(1){
-		consumer(connfd, time);
 		ReceveData(&connfd, &time);
+		consumer(connfd, time);
 	}
 }
 
