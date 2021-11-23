@@ -272,8 +272,9 @@ void* producer(void* arg) {
     clock_gettime(CLOCK_REALTIME, &end);
     t = end.tv_sec * 1000000 + end.tv_nsec / 1000;
     printf("Thread%d end: %ld\n", num, t);
-    t = (end.tv_sec - begin.tv_sec) * 1000000 + (end.tv_nsec - begin.tv_nsec) / 1000;
-    printf("Thread%d minus: %ld\n", num, t);
+    /*체크포인트를 위한 코드*/
+    //t = (end.tv_sec - begin.tv_sec) * 1000000 + (end.tv_nsec - begin.tv_nsec) / 1000;
+    //printf("Thread%d minus: %ld\n", num, t);
 }
 
 int main(void)
