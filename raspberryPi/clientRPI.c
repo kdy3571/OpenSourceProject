@@ -12,6 +12,8 @@
 
 #define MAXTIMINGS 83
 #define DHTPIN 7
+#define BTN 9
+#define CLEAR 2375
 
 void getargs_pi(char* hostname, int* port, char* filename, float* period)
 {
@@ -152,9 +154,18 @@ int main(void)
 	if (wiringPiSetup() == -1)
 		exit(1); 
 
+	digitalWrite(DHTPIN, HIGH);
+	delayMicroseconds(30);
+	pinMode(BTN, INPUT);
+
 	while (1) {
-		read_dht11_dat(hostname, port, filename, period);
-		delay(1000);
+		if (digitalRead(BTN) == HIGH) {
+			read_dht11_dat(hostname, port, filename, period);
+			delay(1000);
+		}
+		else {
+			userTask("clear", hostname, port, filename, CLEAR);
+		}
+
 	}
-	return 0;
 }
