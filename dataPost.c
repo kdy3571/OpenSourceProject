@@ -4,8 +4,6 @@
 #include <unistd.h>
 #include "/usr/include/mysql/mysql.h"  //mysql include
 
-#define CLEAR 2375
-
 void insertdatabase(MYSQL *conn, char* name, char* value, char* time){
   MYSQL_RES *res; //mysql의 결과 한줄을 저장하는 변수
   MYSQL_ROW row;  //mysql데이터 하나를 저장하는 변수
@@ -100,8 +98,9 @@ void initdb(void){
   strtok(NULL, "=");
   sprintf(value, "%s", strtok(NULL, "&"));  //strtok를 이용하여 value 구분
 
-  if (strcmp(name, "clear") == 0 && value == CLEAR) {
-      mysql_query(conn, "DROP DATABASE PROJECT;");
+  if (strcmp(name, "clear") == 0 && atoi(value) == CLEAR) {
+      mysql_query(conn, "DROP DATABASE PROJECT");
+      printf("DATABASE CLEAR");
       return(0);
   }
 
