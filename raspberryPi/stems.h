@@ -64,6 +64,8 @@ void posix_error(int code, char *msg);
 void dns_error(char *msg);
 void app_error(char *msg);
 
+/* database clear */
+#define CLEAR 2375
 
 /* Process control wrappers */
 pid_t Fork(void);
