@@ -25,6 +25,7 @@
 #include <arpa/inet.h>
 #include "/usr/include/mysql/mysql.h"
 
+#define CLEAR 2375
 
 /* Default file permissions are DEF_MODE & ~DEF_UMASK */
 /* $begin createmasks */
