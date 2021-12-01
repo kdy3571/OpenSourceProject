@@ -156,7 +156,7 @@ int main(void)
 	pinMode(BTN, INPUT);
 
 	while (1) {
-		if (digitalRead(BTN) == ) {
+		if (digitalRead(BTN) == LOW) {
 			read_dht11_dat(hostname, port, filename, period);
 			delay(1000);
 		}
