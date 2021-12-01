@@ -25,6 +25,7 @@
 #include <arpa/inet.h>
 #include "/usr/include/mariadb/mysql.h"
 
+/*DB CLEAR*/
 #define CLEAR 2375
 
 /* Default file permissions are DEF_MODE & ~DEF_UMASK */
