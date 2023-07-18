@@ -20,3 +20,4 @@
 - dataGet.c, dataPost.c : Rasberry-Pi를 통해 받아온 데이터를 저장하고 송수신함.
 - request.c : 서버에 요청을 위한 파일
 - stems.c : 프로젝트 진행에 제공된 파일, hlelper 함수, RIO 패키지가 존재
+- clientRPI.c : 라즈베리파이에서 온습도를 주기적으로 받아서 서버에 보내준다.
